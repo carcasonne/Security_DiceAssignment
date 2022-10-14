@@ -35,6 +35,7 @@ class Client(DatagramProtocol):
             while True:
                 self.transport.write(input(":::").encode('utf-8'), self.Address)
         finally:
+            print("hej")
             # Some code to inform server that this client has lost connection
 
     
