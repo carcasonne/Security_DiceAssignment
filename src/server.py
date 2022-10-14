@@ -11,6 +11,7 @@ class Server(DatagramProtocol):
         if datagram == "ready":
             addresses = "\n".join([str(x) for x in self.clients])
 
+            # TODO: also include username here
             self.transport.write(addresses.encode('utf-8'), addr)
             self.clients.add(addr)
 
