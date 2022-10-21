@@ -18,6 +18,7 @@ class Server(DatagramProtocol):
 
         if request == "Requesting possible connections":
             allOtherClients = self.clients
+            # A person shouldn't be able to talk to themselves (schizophrenia)
             if (addr, name) in allOtherClients:
                 allOtherClients.remove((addr, name))
 
