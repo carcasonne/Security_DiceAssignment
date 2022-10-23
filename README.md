@@ -1,8 +1,11 @@
 # Security_DiceAssignment
 
+Required python packages used:
 pip install twisted
+pip install pycryptodome
 
 
-run server first
+How to run the program:
+python3 src/main.py
 
-then run a client
+Choose names for each client (you will be prompted) and run the command '/dice' 

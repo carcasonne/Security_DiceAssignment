@@ -11,16 +11,18 @@ class Server(DatagramProtocol):
 
         split = datagram.split('*')
         request = split[0]
-        name    = ""
+        name = ""
+        publicKey = ""
 
         if(len(split) > 1):
             name = split[1]
+            publicKey = split[2]
 
         if request == "Requesting possible connections":
             allOtherClients = self.clients
             # A person shouldn't be able to talk to themselves (schizophrenia)
-            if (addr, name) in allOtherClients:
-                allOtherClients.remove((addr, name))
+            if (addr, name, publicKey) in allOtherClients:
+                allOtherClients.remove((addr, name, publicKey))
 
             addresses = ""
 
@@ -36,7 +38,7 @@ class Server(DatagramProtocol):
 
             # TODO: also include username here
             self.transport.write(addresses.encode('utf-8'), addr)
-            self.clients.add((addr, name))
+            self.clients.add((addr, name, publicKey))
 
 if __name__ == "__main__":
     reactor.listenUDP(9999, Server())
