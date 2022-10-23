@@ -34,11 +34,26 @@ class Client(DatagramProtocol):
         self.PublicKey = pk
         self.PrivateKey = sk
 
+        # Not a pretty solution but whatever... not the point of the assignment
+        self.AwaitingSign = False
+        self.CurrentCipher = None
+
         print("Client has been created with ID:", self.Id)
 
+    # Will always switch between recieving message and sign
     def datagramReceived(self, datagram: bytes, addr):
-        datagram = self.decryptRecievedMessage(datagram)
+
+        if self.AwaitingSign:
+            valid_signature = self.verify(self.CurrentCipher, datagram)
+            if valid_signature != "Valid Signature":
+                print(f"{self.Username}: Signature is invalid! WTF")
+            self.AwaitingSign = False
+            return
         
+        self.CurrentCipher = self.decrypt(datagram)
+        datagram = self.decryptRecievedMessage(datagram) 
+        self.AwaitingSign = True
+
         # Commands which are only possible within the protocol
         if self.ProtocolActive:
             # Bob recieves Alice's Commitment (step 3) and sends his own roll (step 4)
@@ -164,21 +179,19 @@ class Client(DatagramProtocol):
         time.sleep(2) # drumroll please
         print(f"{int(roll)}!")
 
-    # Order: Encode, sign, encrypt
+    # Order: Encode, encrypt
     def sendEncryptedMessage(self, msg):
         msg = msg.encode('utf-8')
-        #msg = self.sign(msg)
+        sign = self.sign(msg)
         msg = self.encrypt(msg)
-        self.transport.write(msg, self.Connection)
 
-    # Order: Decrypt, verify, decode
+        self.transport.write(msg, self.Connection)
+        time.sleep(0.5)
+        self.transport.write(sign, self.Connection)
+
+    # Order: Decrypt, decode
     def decryptRecievedMessage(self, msg):
         msg = self.decrypt(msg)
-
-        # valid_signature = self.verify(self.currentCipher, msg)
-        # if valid_signature != "Valid Signature":
-        #     raise exception(f"Message recieved from {self.ConnectionName} has an invalid signature!")
-        
         msg = msg.decode('utf-8')
 
         return msg
