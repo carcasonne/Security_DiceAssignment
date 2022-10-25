@@ -1,6 +1,5 @@
 from twisted.internet import reactor
 from client import Client
-from server import Server
 import time
 from Crypto.PublicKey import RSA
 
